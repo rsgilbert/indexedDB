@@ -8,7 +8,8 @@ req5.onsuccess = event => {
     db = event.target.result
     db.onversionchange = () => console.log('version changed')
     // addNames()
-    getName()
+    // getName()
+    getCustomer()
 }
 
 req5.onerror = event => console.error('error occurred', event)
@@ -17,6 +18,23 @@ req5.onupgradeneeded = event => {
     db = event.target.result
     console.log('onupgradeneeded')
     const objStore = db.createObjectStore('names', { autoIncrement: true })
+}
+function getCustomer() {
+    const transaction = db.transaction(['customers'], 'readonly')
+    transaction.onerror = evt => {
+        console.log('error in transaction', evt)
+    }
+    transaction.oncomplete = evt => {
+        console.log('successfully completed transaction')
+    }
+    const customersObjectStore = transaction.objectStore('customers')
+    const getRequest = customersObjectStore.get('567')
+    getRequest.error = evt => console.log('failed to get customer')
+    getRequest.onsuccess = evt => {
+        const data = getRequest.result
+        console.table({ data })
+    }
+
 }
 
 function getName() {
