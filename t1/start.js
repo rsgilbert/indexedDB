@@ -16,7 +16,8 @@ req5.onsuccess = event => {
     // getAllCustomers()
     // getCustomerByEmail('tt@mail.com')
     // countCustomers()
-    filterCustomers()
+    // filterCustomers()
+    queryNamesDescending()
 }
 
 req5.onerror = event => console.error('error occurred', event)
@@ -84,6 +85,24 @@ function filterCustomers() {
     getAllRequest.onsuccess = evt => {
         console.log({ customers: getAllRequest.result })
     }
+}
+
+function queryNamesDescending() {
+    const names = []
+    const store = getNamesObjectStore()
+    const cursorRequest = store.openCursor(null, 'prev')
+    cursorRequest.onsuccess = evt => {
+        const cursor = cursorRequest.result
+        if(cursor) {
+            console.log(cursor.value)
+            names.push(cursor.value)
+            cursor.continue()
+        }
+        else {
+            console.log(names)
+        }
+    }
+
 }
 
 function getCustomer() {
@@ -164,4 +183,16 @@ function getCustomersObjectStore(readmode = 'readonly') {
     }
     const customersObjectStore = transaction.objectStore('customers')
     return customersObjectStore;
+}
+
+function getNamesObjectStore(readmode = 'readonly') {
+    const transaction = db.transaction(['names'], readmode)
+    transaction.onerror = evt => {
+        console.log('error in transaction', evt)
+    }
+    transaction.oncomplete = evt => {
+        console.log('successfully completed transaction')
+    }
+    const namesObjectStore = transaction.objectStore('names')
+    return namesObjectStore;
 }
