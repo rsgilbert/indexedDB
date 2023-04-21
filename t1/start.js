@@ -9,7 +9,10 @@ req5.onsuccess = event => {
     db.onversionchange = () => console.log('version changed')
     // addNames()
     // getName()
-    getCustomer()
+    // getCustomer()
+    updateCustomerEmail("600", 'tt@mail.com')
+    updateCustomerEmail("567", 'mmm@mail.com')
+    updateCustomerEmail("123", 'jj@mail.com')
 }
 
 req5.onerror = event => console.error('error occurred', event)
@@ -19,15 +22,27 @@ req5.onupgradeneeded = event => {
     console.log('onupgradeneeded')
     const objStore = db.createObjectStore('names', { autoIncrement: true })
 }
+
+function getAllCustomers() {
+    let customers = []
+    const customersObjectStore = getCustomersObjectStore('readonly')
+    const openCursorRequest = customersObjectStore.openCursor()
+    openCursorRequest.onsuccess = evt => {
+        const cursor =openCursorRequest.result;
+        if(cursor) {
+            console.log('pushing customer', cursor.value)
+            customers.push(cursor.value);
+            cursor.continue()
+        }
+        else {
+            console.log('got all customers', customers)
+        }
+    }
+
+}
+
 function getCustomer() {
-    const transaction = db.transaction(['customers'], 'readonly')
-    transaction.onerror = evt => {
-        console.log('error in transaction', evt)
-    }
-    transaction.oncomplete = evt => {
-        console.log('successfully completed transaction')
-    }
-    const customersObjectStore = transaction.objectStore('customers')
+    const customersObjectStore = getCustomersObjectStore('readonly')
     const getRequest = customersObjectStore.get('567')
     getRequest.error = evt => console.log('failed to get customer')
     getRequest.onsuccess = evt => {
@@ -35,6 +50,25 @@ function getCustomer() {
         console.table({ data })
     }
 
+}
+
+function updateCustomerEmail(idNo, newEmail) {
+    const customersObjectStore = getCustomersObjectStore('readwrite')
+    const getRequest = customersObjectStore.get(idNo)
+    getRequest.error = evt => console.log('failed to get customer')
+    getRequest.onsuccess = evt => {
+        const customer = getRequest.result
+        console.table({ customer })
+        // perform update
+        customer.email = newEmail;
+        const updateRequest = customersObjectStore.put(customer)
+        updateRequest.onerror = evt => {
+            console.log('error, failed to update', evt)
+        }
+        updateRequest.onsuccess = evt => {
+            console.log('successfully updated entry')
+        }
+    }
 }
 
 function getName() {
@@ -66,11 +100,23 @@ function addNames() {
     const nameObjectStore = transaction.objectStore('names')
 
     const nameData = ['Gilbert', 'Jerry', 'Ronald', 'Paul']
-    for(const name of nameData) {
+    for (const name of nameData) {
         nameObjectStore.add(name)
     }
 
     nameObjectStore.delete(14)
 
 
+}
+
+function getCustomersObjectStore(readmode = 'readonly') {
+    const transaction = db.transaction(['customers'], readmode)
+    transaction.onerror = evt => {
+        console.log('error in transaction', evt)
+    }
+    transaction.oncomplete = evt => {
+        console.log('successfully completed transaction')
+    }
+    const customersObjectStore = transaction.objectStore('customers')
+    return customersObjectStore;
 }
