@@ -13,7 +13,9 @@ req5.onsuccess = event => {
     // updateCustomerEmail("600", 'tt@mail.com')
     // updateCustomerEmail("567", 'mmm@mail.com')
     // updateCustomerEmail("123", 'jj@mail.com')
-    getAllCustomers()
+    // getAllCustomers()
+    getCustomerByEmail('tt@mail.com')
+    countCustomers()
 }
 
 req5.onerror = event => console.error('error occurred', event)
@@ -29,8 +31,8 @@ function getAllCustomers() {
     const customersObjectStore = getCustomersObjectStore('readonly')
     const openCursorRequest = customersObjectStore.openCursor()
     openCursorRequest.onsuccess = evt => {
-        const cursor =openCursorRequest.result;
-        if(cursor) {
+        const cursor = openCursorRequest.result;
+        if (cursor) {
             console.log('pushing customer', cursor.value)
             customers.push(cursor.value);
             cursor.continue()
@@ -47,14 +49,34 @@ function getAllCustomers() {
         console.log({ custs })
     }
 
-     // alt - get customer keys
-     const getAllKeysRequest = customersObjectStore.getAllKeys()
-     getAllKeysRequest.onsuccess = evt => {
-         const custKeys = getAllKeysRequest.result;
-         console.log({ custKeys })
-     }
-
+    // alt - get customer keys
+    const getAllKeysRequest = customersObjectStore.getAllKeys()
+    getAllKeysRequest.onsuccess = evt => {
+        const custKeys = getAllKeysRequest.result;
+        console.log({ custKeys })
+    }
 }
+
+function getCustomerByEmail(email) {
+    const customersObjectStore = getCustomersObjectStore('readonly')
+    const emailIndex = customersObjectStore.index('email')
+    const emailGetRequest = emailIndex.get(email)
+    emailGetRequest.onsuccess = evt => {
+        const customer = emailGetRequest.result;
+        console.log({ customer })
+    }
+}
+
+function countCustomers() {
+    const customersObjectStore = getCustomersObjectStore('readonly')
+    const countRequest = customersObjectStore.count()
+    countRequest.onsuccess = evt => {
+        const customerCount = countRequest.result;
+        console.log({ customerCount })
+    }
+}
+
+// function 
 
 function getCustomer() {
     const customersObjectStore = getCustomersObjectStore('readonly')
