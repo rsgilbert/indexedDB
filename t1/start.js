@@ -14,8 +14,9 @@ req5.onsuccess = event => {
     // updateCustomerEmail("567", 'mmm@mail.com')
     // updateCustomerEmail("123", 'jj@mail.com')
     // getAllCustomers()
-    getCustomerByEmail('tt@mail.com')
-    countCustomers()
+    // getCustomerByEmail('tt@mail.com')
+    // countCustomers()
+    filterCustomers()
 }
 
 req5.onerror = event => console.error('error occurred', event)
@@ -76,7 +77,14 @@ function countCustomers() {
     }
 }
 
-// function 
+function filterCustomers() {
+    const customersObjectStore = getCustomersObjectStore('readonly')
+    const range = IDBKeyRange.bound('500', '700')
+    const getAllRequest = customersObjectStore.getAll(range)
+    getAllRequest.onsuccess = evt => {
+        console.log({ customers: getAllRequest.result })
+    }
+}
 
 function getCustomer() {
     const customersObjectStore = getCustomersObjectStore('readonly')
