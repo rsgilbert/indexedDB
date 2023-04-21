@@ -10,9 +10,10 @@ req5.onsuccess = event => {
     // addNames()
     // getName()
     // getCustomer()
-    updateCustomerEmail("600", 'tt@mail.com')
-    updateCustomerEmail("567", 'mmm@mail.com')
-    updateCustomerEmail("123", 'jj@mail.com')
+    // updateCustomerEmail("600", 'tt@mail.com')
+    // updateCustomerEmail("567", 'mmm@mail.com')
+    // updateCustomerEmail("123", 'jj@mail.com')
+    getAllCustomers()
 }
 
 req5.onerror = event => console.error('error occurred', event)
@@ -38,6 +39,20 @@ function getAllCustomers() {
             console.log('got all customers', customers)
         }
     }
+
+    // alt - get customers
+    const getAllRequest = customersObjectStore.getAll()
+    getAllRequest.onsuccess = evt => {
+        const custs = getAllRequest.result;
+        console.log({ custs })
+    }
+
+     // alt - get customer keys
+     const getAllKeysRequest = customersObjectStore.getAllKeys()
+     getAllKeysRequest.onsuccess = evt => {
+         const custKeys = getAllKeysRequest.result;
+         console.log({ custKeys })
+     }
 
 }
 
